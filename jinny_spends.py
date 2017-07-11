@@ -39,24 +39,29 @@ def restricted(func):
 
 @restricted
 def start(bot, update):
+    logging.INFO("Entered start()")
     markup = replykeyboardmarkup.ReplyKeyboardMarkup(keyboard=keyboard_start)
     bot.sendMessage(chat_id=update.message.chat_id, text=msg_greeting,
                     reply_markup=markup)
+    logging.INFO("Quiting start()")
 
 
 def main():
 
-    handler =  RotatingFileHandler(filename="logs/JinnyReminds.log", maxBytes=log_file_size_lmt, backupCount=log_file_count_lmt)
+    handler =  RotatingFileHandler(filename="logs/JinnySpends.log", maxBytes=log_file_size_lmt, backupCount=log_file_count_lmt)
     handler.setFormatter(logging.Formatter('%(asctime)s | %(name)s | %(levelname)s | %(message)s'))
 
     logging.getLogger().addHandler(handler)
     logging.getLogger().setLevel(logging.DEBUG)
+
+    logging.INFO("Entered main() and initialized Logger")
 
     updater = Updater(TOKEN)
     dispatcher = updater.dispatcher
 
     dispatcher.add_handler(CommandHandler('start', start))
 
+    logging.INFO("Going to start polling")
     updater.start_polling()
 
 
