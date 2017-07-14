@@ -7,6 +7,7 @@ msg_i_dont_know_u = "唔識你，唔同你講嘢。"
 
 button_new_item = "記錄新洗費"
 button_show_3D = "三天內洗費"
+regex_show_3D = button_show_3D
 
 keyboard_start=[[button_new_item],[button_show_3D]]
 

@@ -1,5 +1,6 @@
 from jinny_spends_cfg import *
 from jinny_spends_static import *
+from spending_data import *
 import logging
 from logging.handlers import RotatingFileHandler
 
@@ -9,6 +10,23 @@ from telegram import replykeyboardmarkup, inlinekeyboardbutton, inlinekeyboardma
 from telegram import replykeyboardremove
 
 from functools import wraps
+
+
+NEW_EXPENSE, CLONE_EXPENSE = range(2)
+
+def formatting_expense(p_expense):
+    logging.info("Formating expense")
+    if "remark" in p_expense:
+        return "On {}, we spent ${} for {}({}). Fyi: {}".format(p_expense["date"].strftime("%Y-%m-%d"),
+                                                            p_expense["amt"],
+                                                            p_expense["item"],
+                                                            p_expense["cat"],
+                                                            p_expense["remark"])
+    else:
+        return "On {}, we spent ${} for {}({}).".format(p_expense["date"].strftime("%Y-%m-%d"),
+                                                            p_expense["amt"],
+                                                            p_expense["item"],
+                                                            p_expense["cat"])
 
 # decorator to restrict the use of the functions from unauthorized users
 def restricted(func):
@@ -39,12 +57,19 @@ def restricted(func):
 
 @restricted
 def start(bot, update):
-    logging.INFO("Entered start()")
+    logging.info("Entered start()")
     markup = replykeyboardmarkup.ReplyKeyboardMarkup(keyboard=keyboard_start)
     bot.sendMessage(chat_id=update.message.chat_id, text=msg_greeting,
                     reply_markup=markup)
-    logging.INFO("Quiting start()")
+    logging.info("Quiting start()")
 
+@restricted
+def show_3D_expense(bot, update):
+    logging.info("Entered show_3D_expense()")
+    for each_expense in load_3D_expense():
+        logging.debug("expense item : {}".format(formatting_expense(each_expense)))
+        bot.sendMessage(chat_id=update.message.chat_id, text=formatting_expense(each_expense))
+    logging.info("Quiting show_3D_expense()")
 
 def main():
 
@@ -54,14 +79,15 @@ def main():
     logging.getLogger().addHandler(handler)
     logging.getLogger().setLevel(logging.DEBUG)
 
-    logging.INFO("Entered main() and initialized Logger")
+    logging.info("Entered main() and initialized Logger")
 
     updater = Updater(TOKEN)
     dispatcher = updater.dispatcher
 
     dispatcher.add_handler(CommandHandler('start', start))
+    dispatcher.add_handler(RegexHandler(regex_show_3D, show_3D_expense))
 
-    logging.INFO("Going to start polling")
+    logging.info("Going to start polling")
     updater.start_polling()
 
 
