@@ -55,6 +55,32 @@ def restricted(func):
         return func(bot, update, *args, **kwargs)
     return wrapped
 
+def create_clone_button(p_expense):
+    inline_button = inlinekeyboardbutton.InlineKeyboardButton(text=il_button_clone,
+                                                              callback_data=cb_data_clone.format(p_expense["_id"]))
+    return inline_button
+
+def create_edit_button(p_expense):
+    inline_button = inlinekeyboardbutton.InlineKeyboardButton(text=il_button_edit,
+                                                              callback_data=cb_data_edit.format(p_expense["_id"]))
+    return inline_button
+
+def create_delete_button(p_expense):
+    inline_button = inlinekeyboardbutton.InlineKeyboardButton(text=il_button_delete,
+                                                              callback_data=cb_data_delete.format(p_expense["_id"]))
+    return inline_button
+
+def show_data_set(expense_records, bot, update):
+    logging.info("Entered show_data_set()")
+    for each_expense in expense_records:
+        logging.debug("expense item : {}".format(formatting_expense(each_expense)))
+        bot.sendMessage(chat_id=update.message.chat_id, text=formatting_expense(each_expense),
+                        reply_markup=inlinekeyboardmarkup.InlineKeyboardMarkup([[create_clone_button(each_expense),
+                                                                                 create_edit_button(each_expense),
+                                                                                 create_delete_button(each_expense)]]))
+    logging.info("Quiting show_data_set()")
+
+
 @restricted
 def start(bot, update):
     logging.info("Entered start()")
@@ -66,9 +92,7 @@ def start(bot, update):
 @restricted
 def show_3D_expense(bot, update):
     logging.info("Entered show_3D_expense()")
-    for each_expense in load_3D_expense():
-        logging.debug("expense item : {}".format(formatting_expense(each_expense)))
-        bot.sendMessage(chat_id=update.message.chat_id, text=formatting_expense(each_expense))
+    show_data_set(expense_records=load_3D_expense(), bot=bot, update=update)
     logging.info("Quiting show_3D_expense()")
 
 def main():
