@@ -12,7 +12,7 @@ from telegram import replykeyboardremove
 from functools import wraps
 
 
-NEW_EXPENSE, CLONE_EXPENSE = range(2)
+NEW_EXPENSE_CAT, NEW_EXPENSE_DATE, CLONE_EXPENSE = range(3)
 
 def formatting_expense(p_expense):
     logging.info("Formating expense")
@@ -81,6 +81,12 @@ def show_data_set(expense_records, bot, update):
     logging.info("Quiting show_data_set()")
 
 
+def fallback(bot, update):
+    logging.info("Entered fallback()")
+    bot.sendMessage(chat_id=update.message.chat_id, text=msg_dont_understand)
+    logging.info("Quiting fallback()")
+    return None
+
 @restricted
 def start(bot, update):
     logging.info("Entered start()")
@@ -94,6 +100,20 @@ def show_3D_expense(bot, update):
     logging.info("Entered show_3D_expense()")
     show_data_set(expense_records=load_3D_expense(), bot=bot, update=update)
     logging.info("Quiting show_3D_expense()")
+
+@restricted
+def add_new_expense(bot, update):
+    logging.info("Entered add_new_expense()")
+    # bot.sendMessage(chat_id=update.message.chat_id)
+    logging.info("Quiting add_new_expense()")
+    return NEW_EXPENSE_DATE
+
+@restricted
+def process_expense_date_input(bot, update):
+    logging.info("Entered process_expense_date_input()")
+    # bot.sendMessage(chat_id=update.message.chat_id)
+    logging.info("Quiting process_expense_date_input()")
+    return NEW_EXPENSE_CAT
 
 def main():
 
@@ -110,6 +130,11 @@ def main():
 
     dispatcher.add_handler(CommandHandler('start', start))
     dispatcher.add_handler(RegexHandler(regex_show_3D, show_3D_expense))
+
+    dispatcher.add_handler(ConversationHandler(entry_points=[RegexHandler(button_new_item, add_new_expense)],
+                                               states={NEW_EXPENSE_DATE: [RegexHandler(regex_date_input_pattern, process_expense_date_input)]},
+                                               fallbacks=[MessageHandler(Filters.text, fallback)],
+                                               run_async_timeout=conv_time_out))
 
     logging.info("Going to start polling")
     updater.start_polling()

@@ -2,11 +2,14 @@
 log_file_size_lmt = 10485760
 log_file_count_lmt = 3
 
+conv_time_out = 20
+
 cat_list = ["Domestic", "Cook", "Drive", "Jinny", "Mortgage", "Bill", "Meal", "Misc", "Transport",
             "Leisure", "DanSan", "Clothes", "Apartment"]
 
 log_i_dont_know_u = "唔識你（{}），唔同你講嘢。"
 msg_i_dont_know_u = "唔識你，唔同你講嘢。"
+msg_dont_understand = "唔明，請再試過啦。"
 
 button_new_item = "記錄新洗費"
 button_show_3D = "三天內洗費"
@@ -22,3 +25,5 @@ il_button_edit = "Edit"
 cb_data_edit = "edit_{}"
 il_button_delete = "Delete"
 cb_data_delete = "del_{}"
+
+regex_date_input_pattern = ".*(\d{4}.*\d{2}.*\d{2}).*"
