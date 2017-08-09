@@ -1,4 +1,5 @@
 from jinny_spends_cfg import *
+from jinny_expense import *
 from jinny_spends_static import *
 from spending_data import *
 import logging
