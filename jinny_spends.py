@@ -106,6 +106,9 @@ def show_3D_expense(bot, update):
 def add_new_expense(bot, update):
     logging.info("Entered add_new_expense()")
     # bot.sendMessage(chat_id=update.message.chat_id)
+    markup = replykeyboardmarkup.ReplyKeyboardMarkup(keyboard=keyboard_date)
+    bot.sendMessage(chat_id=update.message.chat_id, text=msg_input_date,
+                    reply_markup=markup)
     logging.info("Quiting add_new_expense()")
     return NEW_EXPENSE_DATE
 
