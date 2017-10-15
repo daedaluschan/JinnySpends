@@ -31,6 +31,7 @@ msg_input_date = "請輸入日子（YYYYMMDD）。"
 button_today = "今日"
 button_ytd = "尋日"
 button_previous_2d = "前日"
+regex_date_options = "{}|{}|{}".format(button_today, button_ytd, button_previous_2d)
 button_use_calendar = "用小日曆"
 
 keyboard_date = [[button_today, button_ytd, button_previous_2d], [button_use_calendar]]
