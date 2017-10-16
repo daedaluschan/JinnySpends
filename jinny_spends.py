@@ -2,6 +2,7 @@ from jinny_spends_cfg import *
 from jinny_expense import *
 from jinny_spends_static import *
 from spending_data import *
+from datetime import timedelta
 import logging
 from logging.handlers import RotatingFileHandler
 
@@ -14,6 +15,8 @@ from functools import wraps
 
 
 NEW_EXPENSE_CAT, NEW_EXPENSE_DATE, CLONE_EXPENSE = range(3)
+
+captioned_expense = {}
 
 def formatting_expense(p_expense):
     logging.info("Formating expense")
@@ -114,7 +117,19 @@ def add_new_expense(bot, update):
 
 @restricted
 def date_option_picked(bot, update):
+    session = update.message.chat_id
+    captioned_expense[session] = expense()
     logging.info("Entered date_option_picked()")
+    if update.message.text == button_today:
+        logging.info("clicked today")
+        # newly initialized expense object has an expense date of today by default
+    elif update.message.text == button_ytd:
+        logging.info("clicked yesterday")
+        captioned_expense[session].expense_date = captioned_expense[session].expense_date + timedelta(days=-1)
+    elif update.message.text == button_previous_2d:
+        logging.info("clicked previous 2 day")
+        captioned_expense[session].expense_date = captioned_expense[session].expense_date + timedelta(days=-2)
+
     # bot.sendMessage(chat_id=update.message.chat_id)
     logging.info("Quiting date_option_picked()")
     return NEW_EXPENSE_CAT
@@ -124,6 +139,13 @@ def process_expense_date_input(bot, update):
     logging.info("Entered process_expense_date_input()")
     # bot.sendMessage(chat_id=update.message.chat_id)
     logging.info("Quiting process_expense_date_input()")
+    return NEW_EXPENSE_CAT
+
+@restricted
+def process_expense_cat_input(bot, update):
+    logging.info("Entered process_expense_cat_input()")
+    # bot.sendMessage(chat_id=update.message.chat_id)
+    logging.info("Quiting process_expense_cat_input()")
     return NEW_EXPENSE_CAT
 
 def main():
@@ -144,7 +166,8 @@ def main():
 
     dispatcher.add_handler(ConversationHandler(entry_points=[RegexHandler(button_new_item, add_new_expense)],
                                                states={NEW_EXPENSE_DATE: [RegexHandler(regex_date_input_pattern, process_expense_date_input),
-                                                                          RegexHandler(regex_date_options, date_option_picked)]},
+                                                                          RegexHandler(regex_date_options, date_option_picked)],
+                                                       NEW_EXPENSE_CAT: [RegexHandler(".*", process_expense_cat_input)]},
                                                fallbacks=[MessageHandler(Filters.text, fallback)],
                                                run_async_timeout=conv_time_out))
 
