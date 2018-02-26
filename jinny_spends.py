@@ -12,7 +12,7 @@ from telegram import replykeyboardmarkup, inlinekeyboardbutton, inlinekeyboardma
 from telegram import replykeyboardremove
 
 from functools import wraps
-
+import re
 
 NEW_EXPENSE_CAT, NEW_EXPENSE_DATE, CLONE_EXPENSE = range(3)
 
@@ -117,9 +117,9 @@ def add_new_expense(bot, update):
 
 @restricted
 def date_option_picked(bot, update):
+    logging.info("Entered date_option_picked()")
     session = update.message.chat_id
     captioned_expense[session] = expense()
-    logging.info("Entered date_option_picked()")
     if update.message.text == button_today:
         logging.info("clicked today")
         # newly initialized expense object has an expense date of today by default
@@ -145,6 +145,13 @@ def process_expense_date_input(bot, update):
 def process_expense_cat_input(bot, update):
     logging.info("Entered process_expense_cat_input()")
     # bot.sendMessage(chat_id=update.message.chat_id)
+    session = update.message.chat_id
+    captioned_expense[session] = expense()
+    matched_obj = re.match(re.compile(regex_date_input_pattern), update.callback_query["data"])
+    yyyy = int(matched_obj.group(1))
+    mm = int(matched_obj.group(2))
+    dd = int(matched_obj.group(3))
+    captioned_expense[session].expense_date = date(yyyy, mm, dd)
     logging.info("Quiting process_expense_cat_input()")
     return NEW_EXPENSE_CAT
 

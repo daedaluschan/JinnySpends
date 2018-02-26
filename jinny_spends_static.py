@@ -36,4 +36,4 @@ button_use_calendar = "用小日曆"
 
 keyboard_date = [[button_today, button_ytd, button_previous_2d], [button_use_calendar]]
 
-regex_date_input_pattern = ".*(\d{4}.*\d{2}.*\d{2}).*"
+regex_date_input_pattern = ".*(\d{4}).*(\d{2}).*(\d{2}).*"
