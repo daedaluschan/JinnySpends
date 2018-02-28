@@ -109,6 +109,9 @@ def show_3D_expense(bot, update):
 def add_new_expense(bot, update):
     logging.info("Entered add_new_expense()")
     # bot.sendMessage(chat_id=update.message.chat_id)
+    session = update.message.chat_id
+    captioned_expense[session] = expense()
+
     markup = replykeyboardmarkup.ReplyKeyboardMarkup(keyboard=keyboard_date)
     bot.sendMessage(chat_id=update.message.chat_id, text=msg_input_date,
                     reply_markup=markup)
@@ -119,7 +122,7 @@ def add_new_expense(bot, update):
 def date_option_picked(bot, update):
     logging.info("Entered date_option_picked()")
     session = update.message.chat_id
-    captioned_expense[session] = expense()
+
     if update.message.text == button_today:
         logging.info("clicked today")
         # newly initialized expense object has an expense date of today by default
@@ -130,7 +133,9 @@ def date_option_picked(bot, update):
         logging.info("clicked previous 2 day")
         captioned_expense[session].expense_date = captioned_expense[session].expense_date + timedelta(days=-2)
 
-    # bot.sendMessage(chat_id=update.message.chat_id)
+    logging.debug("input date is : {}".format(captioned_expense[session].expense_date.__str__()))
+    bot.sendMessage(chat_id=update.message.chat_id, text=msg_picked_date.format(captioned_expense[session].expense_date.__str__()))
+    bot.sendMessage(chat_id=update.message.chat_id, text=msg_which_cat)
     logging.info("Quiting date_option_picked()")
     return NEW_EXPENSE_CAT
 
@@ -138,6 +143,16 @@ def date_option_picked(bot, update):
 def process_expense_date_input(bot, update):
     logging.info("Entered process_expense_date_input()")
     # bot.sendMessage(chat_id=update.message.chat_id)
+    session = update.message.chat_id
+    matched_obj = re.match(re.compile(regex_date_input_pattern), update.message.text)
+    yyyy = int(matched_obj.group(1))
+    mm = int(matched_obj.group(2))
+    dd = int(matched_obj.group(3))
+    captioned_expense[session].expense_date = date(yyyy, mm, dd)
+
+    logging.debug("input date is : {}".format(captioned_expense[session].expense_date.__str__()))
+    bot.sendMessage(chat_id=update.message.chat_id, text=msg_picked_date.format(captioned_expense[session].expense_date.__str__()))
+    bot.sendMessage(chat_id=update.message.chat_id, text=msg_which_cat)
     logging.info("Quiting process_expense_date_input()")
     return NEW_EXPENSE_CAT
 
@@ -145,13 +160,6 @@ def process_expense_date_input(bot, update):
 def process_expense_cat_input(bot, update):
     logging.info("Entered process_expense_cat_input()")
     # bot.sendMessage(chat_id=update.message.chat_id)
-    session = update.message.chat_id
-    captioned_expense[session] = expense()
-    matched_obj = re.match(re.compile(regex_date_input_pattern), update.callback_query["data"])
-    yyyy = int(matched_obj.group(1))
-    mm = int(matched_obj.group(2))
-    dd = int(matched_obj.group(3))
-    captioned_expense[session].expense_date = date(yyyy, mm, dd)
     logging.info("Quiting process_expense_cat_input()")
     return NEW_EXPENSE_CAT
 
