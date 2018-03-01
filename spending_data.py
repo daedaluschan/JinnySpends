@@ -16,3 +16,8 @@ def load_3D_expense():
 
     logging.info("Returning spending_data.load_3D_expense()")
     return consume.find({"date": { "$gte" : from_date }})
+
+def get_expense_cat():
+    logging.info("Entered spending_data.get_expense_cat()")
+    logging.info("Returning spending_data.get_expense_cat()")
+    return consume.distinct("cat")

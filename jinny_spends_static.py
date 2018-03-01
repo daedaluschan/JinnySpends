@@ -4,8 +4,8 @@ log_file_count_lmt = 3
 
 conv_time_out = 20
 
-cat_list = ["Domestic", "Cook", "Drive", "Jinny", "Mortgage", "Bill", "Meal", "Misc", "Transport",
-            "Leisure", "DanSan", "Clothes", "Apartment"]
+# cat_list = ["Domestic", "Cook", "Drive", "Jinny", "Mortgage", "Bill", "Meal", "Misc", "Transport",
+#            "Leisure", "DanSan", "Clothes", "Apartment"]
 
 log_i_dont_know_u = "唔識你（{}），唔同你講嘢。"
 msg_i_dont_know_u = "唔識你，唔同你講嘢。"

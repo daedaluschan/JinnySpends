@@ -135,7 +135,7 @@ def date_option_picked(bot, update):
 
     logging.debug("input date is : {}".format(captioned_expense[session].expense_date.__str__()))
     bot.sendMessage(chat_id=update.message.chat_id, text=msg_picked_date.format(captioned_expense[session].expense_date.__str__()))
-    bot.sendMessage(chat_id=update.message.chat_id, text=msg_which_cat)
+    choose_from_cats(bot, update)
     logging.info("Quiting date_option_picked()")
     return NEW_EXPENSE_CAT
 
@@ -152,7 +152,7 @@ def process_expense_date_input(bot, update):
 
     logging.debug("input date is : {}".format(captioned_expense[session].expense_date.__str__()))
     bot.sendMessage(chat_id=update.message.chat_id, text=msg_picked_date.format(captioned_expense[session].expense_date.__str__()))
-    bot.sendMessage(chat_id=update.message.chat_id, text=msg_which_cat)
+    choose_from_cats(bot, update)
     logging.info("Quiting process_expense_date_input()")
     return NEW_EXPENSE_CAT
 
@@ -162,6 +162,28 @@ def process_expense_cat_input(bot, update):
     # bot.sendMessage(chat_id=update.message.chat_id)
     logging.info("Quiting process_expense_cat_input()")
     return NEW_EXPENSE_CAT
+
+@restricted
+def choose_from_cats(bot, update):
+    logging.info("Entered choose_from_cats()")
+    # bot.sendMessage(chat_id=update.message.chat_id)
+
+    cat_list = get_expense_cat()
+    logging.debug("Extracted catagory list : {}".format(cat_list))
+
+    # keyboard_row = []
+    keyboard_cat = []
+
+    for idx, each_cat in enumerate(cat_list):
+        if idx % 3 == 0:
+            keyboard_cat.append([])
+
+        keyboard_cat[len(keyboard_cat) - 1].append(each_cat)
+
+    markup = replykeyboardmarkup.ReplyKeyboardMarkup(keyboard=keyboard_cat)
+    bot.sendMessage(chat_id=update.message.chat_id, text=msg_which_cat, reply_markup=markup)
+
+    logging.info("Quiting choose_from_cats()")
 
 def main():
 
