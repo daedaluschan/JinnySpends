@@ -4,9 +4,6 @@ log_file_count_lmt = 3
 
 conv_time_out = 20
 
-# cat_list = ["Domestic", "Cook", "Drive", "Jinny", "Mortgage", "Bill", "Meal", "Misc", "Transport",
-#            "Leisure", "DanSan", "Clothes", "Apartment"]
-
 log_i_dont_know_u = "唔識你（{}），唔同你講嘢。"
 msg_i_dont_know_u = "唔識你，唔同你講嘢。"
 msg_dont_understand = "唔明，請再試過啦。"
@@ -40,3 +37,8 @@ regex_date_input_pattern = ".*(\d{4}).*(\d{2}).*(\d{2}).*"
 
 msg_picked_date = "日期係: {}"
 msg_which_cat = "請選擇洗費類別。"
+
+msg_cat_not_found = "唔好意思，搵唔到呢個類別。你再揀過啦。"
+msg_confirm_cat_selection = "類別係: {}"
+
+msg_cacelled = "取消咗。"

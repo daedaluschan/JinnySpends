@@ -14,8 +14,9 @@ from telegram import replykeyboardremove
 from functools import wraps
 import re
 
-NEW_EXPENSE_CAT, NEW_EXPENSE_DATE, CLONE_EXPENSE = range(3)
+NEW_EXPENSE_CAT, NEW_EXPENSE_DATE, CLONE_EXPENSE, NEW_EXPENSE_ITEM = range(4)
 
+cat_list = get_expense_cat()
 captioned_expense = {}
 
 def formatting_expense(p_expense):
@@ -100,6 +101,16 @@ def start(bot, update):
     logging.info("Quiting start()")
 
 @restricted
+def cancel(bot, update):
+    session = update.message.chat_id
+    if session in captioned_expense:
+        del captioned_expense[session]
+
+    bot.sendMessage(chat_id=update.message.chat_id, text=msg_cacelled)
+    start(bot=bot, update=update)
+    return  -1
+
+@restricted
 def show_3D_expense(bot, update):
     logging.info("Entered show_3D_expense()")
     show_data_set(expense_records=load_3D_expense(), bot=bot, update=update)
@@ -135,7 +146,7 @@ def date_option_picked(bot, update):
 
     logging.debug("input date is : {}".format(captioned_expense[session].expense_date.__str__()))
     bot.sendMessage(chat_id=update.message.chat_id, text=msg_picked_date.format(captioned_expense[session].expense_date.__str__()))
-    choose_from_cats(bot, update)
+    choose_from_cats(bot=bot, update=update)
     logging.info("Quiting date_option_picked()")
     return NEW_EXPENSE_CAT
 
@@ -152,26 +163,41 @@ def process_expense_date_input(bot, update):
 
     logging.debug("input date is : {}".format(captioned_expense[session].expense_date.__str__()))
     bot.sendMessage(chat_id=update.message.chat_id, text=msg_picked_date.format(captioned_expense[session].expense_date.__str__()))
-    choose_from_cats(bot, update)
+    choose_from_cats(bot=bot, update=update)
     logging.info("Quiting process_expense_date_input()")
     return NEW_EXPENSE_CAT
 
 @restricted
 def process_expense_cat_input(bot, update):
     logging.info("Entered process_expense_cat_input()")
+    session = update.message.chat_id
+    if update.message.text in cat_list:
+        captioned_expense[session].expense_cat = update.message.text
+        bot.sendMessage(chat_id=update.message.chat_id, text=msg_confirm_cat_selection.format(update.message.text))
+        logging.info("Quiting process_expense_cat_input() - OK")
+        return NEW_EXPENSE_ITEM
+    else:
+        bot.sendMessage(chat_id=update.message.chat_id, text=msg_cat_not_found)
+        choose_from_cats(bot=bot, update=update)
+        logging.info("Quiting process_expense_cat_input() - NOK")
+        return NEW_EXPENSE_CAT
+
+
+
+@restricted
+def process_expense_item_input(bot, update):
+    logging.info("Entered process_expense_item_input()")
     # bot.sendMessage(chat_id=update.message.chat_id)
-    logging.info("Quiting process_expense_cat_input()")
+    logging.info("Quiting process_expense_item_input()")
     return NEW_EXPENSE_CAT
 
 @restricted
 def choose_from_cats(bot, update):
     logging.info("Entered choose_from_cats()")
-    # bot.sendMessage(chat_id=update.message.chat_id)
 
-    cat_list = get_expense_cat()
+    # cat_list = get_expense_cat()
     logging.debug("Extracted catagory list : {}".format(cat_list))
 
-    # keyboard_row = []
     keyboard_cat = []
 
     for idx, each_cat in enumerate(cat_list):
@@ -195,16 +221,20 @@ def main():
 
     logging.info("Entered main() and initialized Logger")
 
+    logging.debug("Extracted catagory list : {}".format(cat_list))
+
     updater = Updater(TOKEN)
     dispatcher = updater.dispatcher
 
     dispatcher.add_handler(CommandHandler('start', start))
+    dispatcher.add_handler(CommandHandler('cancel', cancel))
     dispatcher.add_handler(RegexHandler(regex_show_3D, show_3D_expense))
 
     dispatcher.add_handler(ConversationHandler(entry_points=[RegexHandler(button_new_item, add_new_expense)],
                                                states={NEW_EXPENSE_DATE: [RegexHandler(regex_date_input_pattern, process_expense_date_input),
                                                                           RegexHandler(regex_date_options, date_option_picked)],
-                                                       NEW_EXPENSE_CAT: [RegexHandler(".*", process_expense_cat_input)]},
+                                                       NEW_EXPENSE_CAT: [RegexHandler(".*", process_expense_cat_input)],
+                                                       NEW_EXPENSE_ITEM: [RegexHandler(".*", process_expense_item_input)]},
                                                fallbacks=[MessageHandler(Filters.text, fallback)],
                                                run_async_timeout=conv_time_out))
 
